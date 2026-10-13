@@ -26,10 +26,12 @@
     </footer>
 
     <script>
-        // এখানে আপনার কনফিগারেশন সেট করে দেওয়া হয়েছে
-        const API_BASE_URL = "https://api-router.optimai.network/v1"; 
-        const API_KEY = "oar_nMjb77ajN2Udwhuf_DsiovLN1MUvqFf0Qy"; // আপনার সঠিক API Key
-        const MODEL_NAME = "Qwen 3 VL4B Instruct"; // আপনার মডেলের সঠিক নাম
+        // কনফিগারেশন ও CORS প্রক্সি যুক্ত করা হয়েছে
+        const TARGET_API = "https://api-router.optimai.network/v1/chat/completions";
+        const PROXY_URL = "https://corsproxy.io/?" + encodeURIComponent(TARGET_API);
+        
+        const API_KEY = "oar_nMjb77ajN2Udwhuf_DsiovLN1MUvqFf0Qy"; 
+        const MODEL_NAME = "Qwen 3 VL4B Instruct"; 
 
         async function sendMessage() {
             const userInput = document.getElementById('userInput');
@@ -49,10 +51,7 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
             try {
-                // ইউআরএল ঠিকভাবে জোড়া দেওয়া হয়েছে
-                const endpoint = `${API_BASE_URL.replace(/\/+$/, '')}/chat/completions`;
-
-                const response = await fetch(endpoint, {
+                const response = await fetch(PROXY_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
