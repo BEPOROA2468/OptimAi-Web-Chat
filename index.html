@@ -26,9 +26,9 @@
     </footer>
 
     <script>
-        // কনফিগারেশন ও CORS প্রক্সি যুক্ত করা হয়েছে
+        // প্রক্সি বাদ দিয়ে অল্টারনেটিভ ফ্রি CORS প্রক্সি (allorigins) ব্যবহার করা হয়েছে
         const TARGET_API = "https://api-router.optimai.network/v1/chat/completions";
-        const PROXY_URL = "https://corsproxy.io/?" + encodeURIComponent(TARGET_API);
+        const PROXY_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(TARGET_API);
         
         const API_KEY = "oar_nMjb77ajN2Udwhuf_DsiovLN1MUvqFf0Qy"; 
         const MODEL_NAME = "Qwen 3 VL4B Instruct"; 
