@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OptimAI Local Chat - Qwen 3 VL 4B Instruct</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-between p-4">
+
+    <!-- Header -->
+    <header class="w-full max-w-2xl bg-gray-800 p-4 rounded-xl shadow-md flex flex-col gap-3">
+        <h1 class="text-xl font-bold text-green-400">OptimAI Local Router Chat</h1>
+        <div class="flex flex-col sm:flex-row gap-2">
+            <input type="text" id="apiBaseUrl" placeholder="https://api-router.optimai.network/v1 class="flex-1 bg-gray-700 p-2 rounded text-sm border border-gray-600 focus:outline-none focus:border-green-400">
+            <input type="password" id="apiKey" placeholder="oar_nMjb77ajN2UdWhuf_DsiovLN1MUvqFf0QyvYvY-0qiY" class="flex-1 bg-gray-700 p-2 rounded text-sm border border-gray-600 focus:outline-none focus:border-green-400">
+        </div>
+    </header>
+
+    <!-- Chat Box -->
+    <main id="chatContainer" class="w-full max-w-2xl flex-1 bg-gray-800 my-4 p-4 rounded-xl overflow-y-auto flex flex-col gap-3 shadow-inner max-h-[60vh]">
+        <div class="text-gray-400 text-center text-sm">চ্যাট শুরু করতে নিচের বক্সে মেসেজ লিখুন... (মডেল: Qwen 3 VL4B Instruct)</div>
+    </main>
+
+    <!-- Input Area -->
+    <footer class="w-full max-w-2xl flex gap-2">
+        <input type="text" id="userInput" placeholder="এখানে কিছু লিখুন..." class="flex-1 bg-gray-800 p-3 rounded-xl border border-gray-700 focus:outline-none focus:border-green-400" onkeypress="if(event.key === 'Enter') sendMessage()">
+        <button onclick="sendMessage()" class="bg-green-600 hover:bg-green-500 px-6 rounded-xl font-semibold transition">পাঠান</button>
+    </footer>
+
+    <script>
+        async function sendMessage() {
+            const baseUrl = document.getElementById('apiBaseUrl').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const userInput = document.getElementById('userInput');
+            const chatContainer = document.getElementById('chatContainer');
+            
+            const prompt = userInput.value.trim();
+            if (!prompt) return;
+
+            // ইউজার মেসেজ চ্যাটে যোগ করা
+            chatContainer.innerHTML += `<div class="bg-blue-600 p-3 rounded-lg max-w-[80%] self-end"><b>আপনি:</b> ${prompt}</div>`;
+            userInput.value = '';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // লোডিং মেসেজ
+            const loadingId = 'loading-' + Date.now();
+            chatContainer.innerHTML += `<div id="${loadingId}" class="bg-gray-700 p-3 rounded-lg max-w-[80%] self-start text-gray-300">ভেবে দেখছি...</div>`;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            try {
+                const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: "Qwen 3 VL", // আপনার পিসিতে থাকা মডেলের নাম
+                        messages: [{ role: "user", content: prompt }]
+                    })
+                });
+
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+
+                if (data.choices && data.choices.length > 0) {
+                    const reply = data.choices[0].message.content;
+                    chatContainer.innerHTML += `<div class="bg-gray-700 p-3 rounded-lg max-w-[80%] self-start border border-gray-600"><b>Qwen:</b> ${reply}</div>`;
+                } else {
+                    chatContainer.innerHTML += `<div class="bg-red-600 p-3 rounded-lg max-w-[80%] self-start">এরর: রেসপন্স পাওয়া যায়নি।</div>`;
+                }
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                chatContainer.innerHTML += `<div class="bg-red-600 p-3 rounded-lg max-w-[80%] self-start">কানেকশন এরর: আপনার লোকাল রাউটার বা CORS সেটিংস চেক করুন। (${error.message})</div>`;
+            }
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>
