@@ -26,10 +26,8 @@
     </footer>
 
     <script>
-        // প্রক্সি বাদ দিয়ে অল্টারনেটিভ ফ্রি CORS প্রক্সি (allorigins) ব্যবহার করা হয়েছে
-        const TARGET_API = "https://api-router.optimai.network/v1/chat/completions";
-        const PROXY_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(TARGET_API);
-        
+        // সরাসরি OptimAI রাউটার এন্ডপয়েন্ট
+        const API_URL = "https://api-router.optimai.network/v1/chat/completions";
         const API_KEY = "oar_nMjb77ajN2Udwhuf_DsiovLN1MUvqFf0Qy"; 
         const MODEL_NAME = "Qwen 3 VL4B Instruct"; 
 
@@ -51,7 +49,7 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
             try {
-                const response = await fetch(PROXY_URL, {
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -64,8 +62,7 @@
                 });
 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Server Error (${response.status}): ${errorText}`);
+                    throw new Error(`HTTP Error! Status: ${response.status}`);
                 }
 
                 const data = await response.json();
@@ -81,7 +78,7 @@
                 const loadingElem = document.getElementById(loadingId);
                 if (loadingElem) loadingElem.remove();
                 
-                chatContainer.innerHTML += `<div class="bg-red-600 p-3 rounded-lg max-w-[80%] self-start">কানেকশন এরর: ${error.message}</div>`;
+                chatContainer.innerHTML += `<div class="bg-red-600 p-3 rounded-lg max-w-[80%] self-start">কানেকশন এরর: ব্রাউজার সিকিউরিটি বা CORS পলিসির কারণে রিকোয়েস্ট ব্লক হয়েছে। (কম্পিউটার বা লোকাল সার্ভার থেকে টেস্ট করুন)</div>`;
             }
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
